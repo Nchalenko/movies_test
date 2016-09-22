@@ -8,14 +8,13 @@ $db = new DB('localhost', 'root', '', 'webbylab_test');
 if (isset($_GET['abc'])) {
 	$all = movies::listABC($db);
 } elseif (isset($_GET['title'])) {
-	$all = movies::findByTitle($_GET['title'],$db);
-	echo $_GET['title'];
+	$all = movies::findByTitle($_GET['title'], $db);
 } elseif (isset($_GET['star'])) {
-	$all = movies::findByActor($_GET['star'],$db);
+	$all = movies::findByActor($_GET['star'], $db);
 } elseif (isset($_GET['delete'])) {
-	$all = movies::delete($_GET['delete'],$db);
+	$all = movies::delete($_GET['delete'], $db);
 	header('location: /');
-}elseif (isset($_POST['title']) && isset($_POST['year']) && isset($_POST['format'])) {
+} elseif (isset($_POST['title']) && isset($_POST['year']) && isset($_POST['format'])) {
 	movies::add($db);
 	header('location: /');
 } elseif (isset($_GET['import'])) {
@@ -26,15 +25,15 @@ if (isset($_GET['abc'])) {
 }
 ?>
 <!DOCTYPE html>
+<html>
 <head>
 	<meta charset="utf-8">
-	<title>БИБЛИОТЕКА ФИЛЬМОВ</title>
+	<title>Библиотека фильмов</title>
 	<link rel="stylesheet" href="https://maxcdn.bootstrapcdn.com/bootstrap/3.3.7/css/bootstrap.min.css">
 	<script src="https://ajax.googleapis.com/ajax/libs/jquery/1.12.4/jquery.min.js"></script>
 	<script src="http://maxcdn.bootstrapcdn.com/bootstrap/3.3.7/js/bootstrap.min.js"></script>
 </head>
 <body>
-
 <nav class="navbar navbar-inverse navbar-fixed-top">
 	<div class="container">
 		<div class="navbar-header">
@@ -42,20 +41,20 @@ if (isset($_GET['abc'])) {
 		</div>
 		<div id="navbar" class="navbar-collapse collapse">
 			<a style="margin-top: 8px;" class="btn btn-info" href="?abc">Отобразить в алфавитном порядке</a>
-			<form class="navbar-form navbar-right">
+			<form method="get" action="/?title" name="title" class="navbar-form navbar-right">
 				<div class="form-group">
-					<button href="?title" type="submit" class="btn btn-success">НАЙТИ</button>
+					<button type="submit" class="btn btn-success">НАЙТИ</button>
 					<input name="title" type="text" placeholder="фильм по названию" class="form-control">
 				</div>
 			</form>
-			<form class="navbar-form navbar-right">
+			<form method="get" action="/?star" name="star" class="navbar-form navbar-right">
 				<div class="form-group">
-					<button href="?star" type="submit" class="btn btn-success">НАЙТИ</button>
+					<button type="submit" class="btn btn-success">НАЙТИ</button>
 					<input name="star" type="text" placeholder="фильм по актеру" class="form-control">
 				</div>
 			</form>
 		</div>
-	</div><!--/.navbar-collapse -->
+	</div>
 </nav>
 <br><br><br><br>
 <div class="container">
@@ -83,7 +82,7 @@ if (isset($_GET['abc'])) {
 	</div>
 	<button style="margin-left: 80%" type="button" class="btn btn-success" data-toggle="modal" data-target="#myModal">Импорт</button>
 
-	<!-- Modal -->
+	<!-- ИМПОРТ -->
 	<div class="modal fade" id="myModal" role="dialog">
 		<div class="modal-dialog modal-sm">
 			<div class="modal-content">
@@ -117,21 +116,31 @@ if (isset($_GET['abc'])) {
 		<th>Актерский состав:</th>
 		<th></th>
 		<tr>
-			<?php foreach ($all as $movie){ ?>
-			<td><?= $movie['Title'] ?></td>
-			<td><?= $movie['ReleaseYear'] ?></td>
-			<td><?= $movie['Format'] ?></td>
-			<td><?= $movie['Stars'] ?></td>
-			<td><a class="btn btn-sm btn-danger" href="?delete=<?= $movie['id'] ?>">Удалить</a></td>
+			<?php
+			foreach ($all as $movie){ ?>
+			<td><?= htmlentities($movie['Title']) ?></td>
+			<td><?= htmlentities($movie['ReleaseYear']) ?></td>
+			<td><?= htmlentities($movie['Format']) ?></td>
+			<td><?= htmlentities($movie['Stars']) ?></td>
+			<td><a class="btn btn-sm btn-danger" href="?delete=<?= $movie['id'] ?>" onclick="return confirmDelete()">Удалить</a></td>
 		</tr>
 		<?php } ?>
 	</table>
-</div> <!-- /container -->
+</div>
 <br><br><br>
 <div id="footer">
 	<div class="container">
-		<p class="muted credit text-center">Movies library 2016 <a href="http://martinbean.co.uk">Github</a>.</p>
+		<p class="muted credit text-right">Movies library © 2016 <a href="https://github.com/Nchalenko/movies_test">Github</a>.</p>
 	</div>
 </div>
+<script>
+	function confirmDelete() {
+		if (confirm('Подвердить удаление')) {
+			return true;
+		} else {
+			return false;
+		}
+	}
+</script>
 </body>
 </html>

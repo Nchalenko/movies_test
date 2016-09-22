@@ -21,20 +21,17 @@ class movies
 				ReleaseYear = '{$year}',
 				Format = '{$format}',
 				Stars = '{$stars}'";
+
 		return $db->query($sql);
 	}
 
 	public static function delete($id, $db)
 	{
+		$id = intval($id);
 		$sql = "DELETE FROM movies WHERE id ='{$id}'";
 		return $db->query($sql);
 	}
 
-	public static function showInfo($id, $db)
-	{
-		$sql = "SELECT * FROM movies WHERE id ='{$id}'";
-		return $db->query($sql);
-	}
 
 	public static function listABC($db)
 	{
@@ -44,19 +41,20 @@ class movies
 
 	public static function findByTitle($title, $db)
 	{
+		$title = $db->escape($title);
 		$sql = "SELECT * FROM movies WHERE Title = '{$title}'";
 		return $db->query($sql);
 	}
 
 	public static function findByActor($actor_name, $db)
 	{
+		$actor_name = $db->escape($actor_name);
 		$sql = "SELECT * FROM movies WHERE Stars LIKE ('%{$actor_name}%')";
 		return $db->query($sql);
 	}
 
 	public static function import($db)
 	{
-
 		if (!empty($_FILES)) {
 			copy($_FILES['file']['tmp_name'], "D:/" . basename($_FILES['file']['name']));
 		}
@@ -67,24 +65,18 @@ class movies
 
 		$imp = implode($afterPreg);
 
-		$good = trim($imp);
+		$good_text = trim($imp);
 
-		file_put_contents("D:/" . $_FILES['file']['name'], "\n" . $good);
+		file_put_contents("D:/" . $_FILES['file']['name'], "\n" . $good_text);
 
 		$import = 'D:/' . $_FILES['file']['name'];
 
-		$db = new DB('localhost', 'root', '', 'webbylab_test');
-
-
-		$sql = "LOAD DATA INFILE '" . $import . "'
-INTO TABLE movies
-FIELDS TERMINATED BY '\\n'
-LINES TERMINATED BY '\\n'";
+		$sql = "LOAD DATA INFILE '{$import}'
+				INTO TABLE movies
+				FIELDS TERMINATED BY '\\n'";
 
 		$db->query($sql);
 
 		unlink($import);
-		header('location: /');
-
 	}
 }
